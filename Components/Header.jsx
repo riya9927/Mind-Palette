@@ -1,8 +1,9 @@
 import { assets } from '@/Assets/assets'
 import Image from 'next/image'
-import React from 'react'
+import React, { useState } from 'react'
 
 const Header = () => {
+  
   return (
     <div className="bg-gradient-to-br from-slate-50 to-blue-50">
       <div className="flex items-center justify-between px-6 md:px-12 py-6">

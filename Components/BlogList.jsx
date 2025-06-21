@@ -1,12 +1,27 @@
 import { blog_data } from '@/Assets/assets'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import BlogItem from './BlogItem'
+import axios from 'axios';
 
 const BlogList = () => {
     const [menu, setMenu] = useState("All");
-    
+    const [blogs, setBlogs] = useState([]);
+    // const fetchBlogs=async ()=>{
+    //     const response=await axios.get('/api/blog');
+    //     setBlogs(response.data.blogs);
+    //     console.log(response.data.blogs); 
+    // }
+    const fetchBlogs = async () => {
+        const response = await axios.get('/api/blog');
+        setBlogs(response.data);
+        console.log(response.data);
+    };
+    useEffect(() => {
+        fetchBlogs();
+    }, [])
+
     const categories = ['All', 'Lifestyle', 'Motivation', 'Technology', 'Startup'];
-    
+
     return (
         <div className="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
             {/* Filter Buttons Section */}
@@ -14,16 +29,16 @@ const BlogList = () => {
                 <h2 className="text-3xl font-bold text-center text-gray-900 mb-8">
                     Explore Our <span className="text-blue-600">Blog Categories</span>
                 </h2>
-                
+
                 <div className="flex flex-wrap justify-center gap-3 md:gap-4">
                     {categories.map((category) => (
-                        <button 
+                        <button
                             key={category}
-                            onClick={() => setMenu(category)} 
+                            onClick={() => setMenu(category)}
                             className={`
                                 px-6 py-3 rounded-full font-medium text-sm md:text-base transition-all duration-300 transform hover:scale-105
-                                ${menu === category 
-                                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' 
+                                ${menu === category
+                                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-200'
                                     : 'bg-white text-gray-700 border border-gray-300 hover:border-blue-400 hover:text-blue-600 hover:shadow-md'
                                 }
                             `}
@@ -38,29 +53,28 @@ const BlogList = () => {
             <div >
                 <div className="text-center mb-6">
                     <p className="text-gray-600">
-                        {menu === 'All' 
-                            ? `Showing all ${blog_data.length} articles` 
-                            : `Showing ${blog_data.filter(item => item.category === menu).length} articles in ${menu}`
+                        {menu === 'All'
+                            ? `Showing all ${blogs.length} articles`
+                            : `Showing ${blogs.filter(item => item.category === menu).length} articles in ${menu}`
                         }
                     </p>
                 </div>
-                
+
                 <div className="flex flex-wrap justify-center items-start gap-6">
-                    {blog_data
-                        .filter((item) => menu === 'All' ? true : item.category === menu)
-                        .map((item, index) => (
+                    {blogs.filter((item) => menu === 'All' ? true : item.category === menu).map((item, index) => (
                             <div key={index} className="w-full sm:w-1/2 lg:w-1/3 xl:w-1/4 max-w-sm">
-                                <BlogItem 
-                                    image={item.image} 
-                                    title={item.title} 
-                                    description={item.description} 
-                                    category={item.category} 
+                                <BlogItem
+                                    id={item._id}
+                                    image={item.image}
+                                    title={item.title}
+                                    description={item.description}
+                                    category={item.category}
                                 />
                             </div>
                         ))
                     }
                 </div>
-                
+
                 {/* Empty State */}
                 {blog_data.filter((item) => menu === 'All' ? true : item.category === menu).length === 0 && (
                     <div className="text-center py-16">
@@ -96,7 +110,7 @@ export default BlogList
 //       </div>
 //       <div>
 //         {blog_data.filter((item)=>menu=='All'?true:item.category==menu).map((item,index)=>{
-//             return <BlogItem key={index} image={item.image} title={item.title} description={item.description} category={item.category} />
+//             return <BlogItem key={index} id={item.id} image={item.image} title={item.title} description={item.description} category={item.category} />
 //         })}
 //       </div>
 //     </div>

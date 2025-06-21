@@ -1,6 +1,27 @@
-import React from 'react'
+import React, { useState } from 'react'
+import { assets } from '@/Assets/assets'
+import Image from 'next/image'
+import axios from 'axios'
+import { toast } from 'react-toastify'
 
 const NewsLetter = () => {
+
+    const [email, setEmail] = useState("");
+
+    const onSubmitHandler = async (e) => {
+        e.preventDefault();
+        const formData = new FormData();
+        formData.append("email", email);
+        const response = await axios.post('/api/email', formData);
+        if (response.data.success) {
+            toast.success(response.data.msg);
+            setEmail("");
+        }
+        else {
+            toast.error("Error")
+        }
+    }
+
     return (
         <div className="bg-gradient-to-br from-slate-50 to-blue-50 py-12 md:py-24 px-6 md:px-12">
             <div className="max-w-lg mx-auto">
@@ -14,9 +35,11 @@ const NewsLetter = () => {
                         </p>
                     </div>
 
-                    <form className="space-y-6">
+                    <form onSubmit={onSubmitHandler} className="space-y-6">
                         <div className="relative">
                             <input
+                                onChange={(e) => setEmail(e.target.value)}
+                                value={email}
                                 type='email'
                                 placeholder='Enter Your Email'
                                 className="w-full px-4 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300 text-gray-900 placeholder-gray-500 bg-gray-50 focus:bg-white shadow-sm"
