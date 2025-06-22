@@ -26,7 +26,7 @@ const BlogList = () => {
         <div className="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
             {/* Filter Buttons Section */}
             <div className="mb-12">
-                <h2 className="text-3xl font-bold text-center text-gray-900 mb-8">
+                <h2 className="text-3xl mt-4 font-bold text-center text-gray-900 mb-8">
                     Explore Our <span className="text-blue-600">Blog Categories</span>
                 </h2>
 
