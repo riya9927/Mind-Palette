@@ -7,6 +7,9 @@ import React, { useEffect, useState } from 'react'
 const page = () => {
     const [emails, setEmails] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [editModal, setEditModal] = useState(false);
+    const [editingEmail, setEditingEmail] = useState({ id: '', email: '' });
+    const [editLoading, setEditLoading] = useState(false);
 
     const fetchEmails = async () => {
         try {
@@ -35,12 +38,51 @@ const page = () => {
         }
     }
 
+    const openEditModal = (mongoId, email) => {
+        setEditingEmail({ id: mongoId, email: email });
+        setEditModal(true);
+    }
+
+    const closeEditModal = () => {
+        setEditModal(false);
+        setEditingEmail({ id: '', email: '' });
+    }
+
+    const handleEditSubmit = async (e) => {
+        e.preventDefault();
+        if (!editingEmail.email.trim()) {
+            toast.error("Email cannot be empty");
+            return;
+        }
+
+        try {
+            setEditLoading(true);
+            const response = await axios.put('/api/email', {
+                id: editingEmail.id,
+                email: editingEmail.email
+            });
+
+            if (response.data.success) {
+                toast.success(response.data.msg);
+                fetchEmails();
+                closeEditModal();
+            } else {
+                toast.error("Error updating email");
+            }
+        } catch (error) {
+            console.error('Error updating email:', error);
+            toast.error("Error updating email");
+        } finally {
+            setEditLoading(false);
+        }
+    }
+
     useEffect(() => {
         fetchEmails()
     }, [])
 
     return (
-        <div className="min-h-screen  p-4 md:p-8">
+        <div className="min-h-screen p-4 md:p-8">
             <div className="max-w-6xl mx-auto">
                 {/* Header Section */}
                 <div className="mb-8">
@@ -49,7 +91,6 @@ const page = () => {
                             All Subscriptions
                         </h1>
                     </div>
-
 
                     {/* Stats */}
                     <div className="ml-8 mt-4 flex items-center space-x-6">
@@ -154,6 +195,7 @@ const page = () => {
                                                 email={item.email}
                                                 date={item.date}
                                                 deleteEmail={deleteEmail}
+                                                onEdit={openEditModal}
                                             />
                                         ))
                                     ) : (
@@ -202,49 +244,110 @@ const page = () => {
                     )}
                 </div>
             </div>
+
+            {/* Edit Modal */}
+            {editModal && (
+                <div className="fixed inset-0 bg-black/40 p-6 rounded-xl shadow-lg backdrop-blur-sm flex items-center justify-center z-50">
+                    <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 transform transition-all">
+                        <div className="px-6 py-4 border-b border-gray-200">
+                            <div className="flex items-center justify-between">
+                                <h3 className="text-lg font-semibold text-gray-900">Edit Email</h3>
+                                <button
+                                    onClick={closeEditModal}
+                                    className="text-gray-400 hover:text-gray-600 transition-colors"
+                                >
+                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <form onSubmit={handleEditSubmit} className="p-6">
+                            <div className="mb-4">
+                                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                                    Email Address
+                                </label>
+                                <input
+                                    type="email"
+                                    id="email"
+                                    value={editingEmail.email}
+                                    onChange={(e) => setEditingEmail({ ...editingEmail, email: e.target.value })}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                                    placeholder="Enter email address"
+                                    required
+                                />
+                            </div>
+                            
+                            <div className="flex items-center justify-end space-x-3">
+                                <button
+                                    type="button"
+                                    onClick={closeEditModal}
+                                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                                    disabled={editLoading}
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={editLoading}
+                                    className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                                >
+                                    {editLoading && (
+                                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                    )}
+                                    <span>{editLoading ? 'Updating...' : 'Update Email'}</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }
 
 export default page
 
-// 'use client'
-// import SubsTableItem from '@/Components/AdminComponents/SubsTableItem'
-// import axios from 'axios';
-// import React, { useEffect, useState } from 'react'
 
-// const page = () => {
-//     const [emails,setEmails]=useState([]);
-//     const fetchEmails=async()=>{
-//         const respone=await axios.get('/api/email');
-//         setEmails(respone.data.emails)
-//     }
-//     useEffect(()=>{
-//         fetchEmails()
-//     },[])
-//   return (
-//     <div>
-//       <h1>All Subscription</h1>
-//       <div>
-//         <table>
-//             <thead>
-//                 <tr>
-//                     <th scope='col'>Email Subscription</th>
-//                     <th scope='col'>Date</th>
-//                     <th scope='col'>Action</th>
-//                 </tr>
-//             </thead>
-//             <tbody>
-//                 {
-//                     emails.map((item,index)=>{
-//                         return <SubsTableItem key={index} mongoId={item._id} email={item.email} date={item.date} />
-//                     })
-//                 }
-//             </tbody>
-//         </table>
-//       </div>
-//     </div>
-//   )
-// }
 
-// export default page
+// // 'use client'
+// // import SubsTableItem from '@/Components/AdminComponents/SubsTableItem'
+// // import axios from 'axios';
+// // import React, { useEffect, useState } from 'react'
+
+// // const page = () => {
+// //     const [emails,setEmails]=useState([]);
+// //     const fetchEmails=async()=>{
+// //         const respone=await axios.get('/api/email');
+// //         setEmails(respone.data.emails)
+// //     }
+// //     useEffect(()=>{
+// //         fetchEmails()
+// //     },[])
+// //   return (
+// //     <div>
+// //       <h1>All Subscription</h1>
+// //       <div>
+// //         <table>
+// //             <thead>
+// //                 <tr>
+// //                     <th scope='col'>Email Subscription</th>
+// //                     <th scope='col'>Date</th>
+// //                     <th scope='col'>Action</th>
+// //                 </tr>
+// //             </thead>
+// //             <tbody>
+// //                 {
+// //                     emails.map((item,index)=>{
+// //                         return <SubsTableItem key={index} mongoId={item._id} email={item.email} date={item.date} />
+// //                     })
+// //                 }
+// //             </tbody>
+// //         </table>
+// //       </div>
+// //     </div>
+// //   )
+// // }
+
+// // export default page

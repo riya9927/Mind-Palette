@@ -33,12 +33,12 @@ export default function Layout({ children }) {
                                 <div className="group relative">
                                     <div className="relative flex items-center gap-3 px-4 py-3 bg-white/60 backdrop-blur-sm rounded-2xl border border-white/30 hover:bg-white/80 hover:border-white/50 transition-all duration-300 hover:scale-105 hover:shadow-lg">
                                         <div className="relative">
-                                            <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl  group-hover:scale-110 transition-transform duration-300">
-                                                <Image 
-                                                    src={assets.profile_icon} 
-                                                    alt="Profile"
-                                                    className="w-full h-full"
-                                                />
+                                            <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full overflow-hidden group-hover:scale-110 transition-transform duration-300">
+                                            <Image 
+                                             src={assets.profile_icon} 
+                                             alt="Profile"
+                                             className="w-full h-full object-cover"
+                                            />
                                             </div>
                                         </div>
                                         <div className="hidden md:block">
